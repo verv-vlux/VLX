@@ -1,0 +1,54 @@
+.---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------.
+|                                                                             VervFluxCrowdsale (recursive)                                                                             |
+|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|     Contract      |                               Function                               | Visibility | Constant |    Returns    |                     Modifiers                      |
+|-------------------|----------------------------------------------------------------------|------------|----------|---------------|----------------------------------------------------|
+| CappedCrowdsale   | CappedCrowdsale(uint256)                                             | public     | false    |               |                                                    |
+| CappedCrowdsale   | hasEnded()                                                           | public     | false    | bool          | view                                               |
+| CappedCrowdsale   | validPurchase()                                                      | internal   | false    | bool          | view                                               |
+| Pausable          | pause()                                                              | public     | false    |               | onlyOwner, whenNotPaused                           |
+| Pausable          | unpause()                                                            | public     | false    |               | onlyOwner, whenPaused                              |
+| TokenVesting      | TokenVesting(address, uint256, uint256, uint256, bool)               | public     | false    |               |                                                    |
+| TokenVesting      | release(ERC20Basic)                                                  | public     | false    |               |                                                    |
+| TokenVesting      | revoke(ERC20Basic)                                                   | public     | false    |               | onlyOwner                                          |
+| TokenVesting      | releasableAmount(ERC20Basic)                                         | public     | false    | uint256       | view                                               |
+| TokenVesting      | vestedAmount(ERC20Basic)                                             | public     | false    | uint256       | view                                               |
+| MintableToken     | mint(address, uint256)                                               | public     | false    | bool          | onlyOwner, canMint                                 |
+| MintableToken     | finishMinting()                                                      | public     | false    | bool          | onlyOwner, canMint                                 |
+| Ownable           | Ownable()                                                            | public     | false    |               |                                                    |
+| Ownable           | transferOwnership(address)                                           | public     | false    |               | onlyOwner                                          |
+| StandardToken     | transferFrom(address, address, uint256)                              | public     | false    | bool          |                                                    |
+| StandardToken     | approve(address, uint256)                                            | public     | false    | bool          |                                                    |
+| StandardToken     | allowance(address, address)                                          | public     | false    | uint256       | view                                               |
+| StandardToken     | increaseApproval(address, uint)                                      | public     | false    | bool          |                                                    |
+| StandardToken     | decreaseApproval(address, uint)                                      | public     | false    | bool          |                                                    |
+| BasicToken        | totalSupply()                                                        | public     | false    | uint256       | view                                               |
+| BasicToken        | transfer(address, uint256)                                           | public     | false    | bool          |                                                    |
+| BasicToken        | balanceOf(address)                                                   | public     | false    | uint256       | view                                               |
+| Crowdsale         | Crowdsale(uint256, uint256, uint256, address)                        | public     | false    |               |                                                    |
+| Crowdsale         | ()                                                                   | external   | false    |               | payable                                            |
+| Crowdsale         | buyTokens(address)                                                   | public     | false    |               | payable                                            |
+| Crowdsale         | hasEnded()                                                           | public     | false    | bool          | view                                               |
+| Crowdsale         | createTokenContract()                                                | internal   | false    | MintableToken |                                                    |
+| Crowdsale         | getTokenAmount(uint256)                                              | internal   | false    | uint256       | view                                               |
+| Crowdsale         | forwardFunds()                                                       | internal   | false    |               |                                                    |
+| Crowdsale         | validPurchase()                                                      | internal   | false    | bool          | view                                               |
+| VervFluxCrowdsale | VervFluxCrowdsale(address, address, address, address, uint256)       | public     | false    |               | Crowdsale, CappedCrowdsale                         |
+| VervFluxCrowdsale | isParticipantWhitelisted(address)                                    | public     | false    | bool          | view                                               |
+| VervFluxCrowdsale | hasEnded()                                                           | public     | false    | bool          | view                                               |
+| VervFluxCrowdsale | buyTokens(address)                                                   | public     | false    |               | payable, whenNotPaused, transitionGuard, atStage   |
+| VervFluxCrowdsale | finalize()                                                           | public     | false    |               | whenNotPaused, transitionGuard, atStage            |
+| VervFluxCrowdsale | vestingContract(address)                                             | public     | false    | TokenVesting  | view                                               |
+| VervFluxCrowdsale | updateRate(uint256)                                                  | public     | false    |               | onlyOwner, transitionGuard, atStage                |
+| VervFluxCrowdsale | updateStartTime(uint256)                                             | public     | false    |               | onlyOwner, transitionGuard, atStage                |
+| VervFluxCrowdsale | updateEndTime(uint256)                                               | public     | false    |               | onlyOwner, transitionGuard, atStage                |
+| VervFluxCrowdsale | updateCap(uint256)                                                   | public     | false    |               | onlyOwner, transitionGuard, beforeStage            |
+| VervFluxCrowdsale | whitelistParticipant(address)                                        | public     | false    |               | whenNotPaused, onlyOwner, transitionGuard, atStage |
+| VervFluxCrowdsale | disbursePreBuyersLkdContributions(address, uint256, VestingDuration) | public     | false    |               | payable, onlyOwner, transitionGuard, atStage       |
+| VervFluxCrowdsale | distributePreBuyersLkdRewards(address, uint256, VestingDuration)     | public     | false    |               | whenNotPaused, onlyOwner, transitionGuard, atStage |
+| VervFluxCrowdsale | transition()                                                         | internal   | false    |               |                                                    |
+| VervFluxCrowdsale | createTokenContract()                                                | internal   | false    | MintableToken |                                                    |
+| VervFluxCrowdsale | validInvestment(address)                                             | internal   | false    | bool          | view                                               |
+| VervFluxCrowdsale | getTokenAmount(uint256)                                              | internal   | false    | uint256       | view                                               |
+| VervFluxCrowdsale | nextStage()                                                          | internal   | false    |               |                                                    |
+'---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------'
