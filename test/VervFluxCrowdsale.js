@@ -17,11 +17,10 @@ contract('VervFluxCrowdsale', function(accounts) {
   const MAX_DIST_ERROR_MARGE = 0.1; // meaning 0.1 token error is allowed
   const SEC_3MO = Math.ceil(60 * 60 * 24 * (365 / 4));
   const RATE = '2000';
-  const DAY1_RATE = '2300'; // 15% bonus
-  const DAY2_RATE = '2250'; // 12.5% bonus
-  const DAY3_RATE = '2200'; // 10% bonus
-  const START_TIME = toTime('Saturday, March 31, 2018 12:00:00 AM GMT+00:00');
-  const END_TIME = toTime('Wednesday, April 4, 2018 12:00:00 AM GMT+00:00');
+  const DAY1_RATE = '2100'; // 5% bonus
+  const DAY2_RATE = '2050'; // 2.5% bonus
+  const START_TIME = toTime('Tuesday, May 1, 2018 0:00:00 AM GMT+00:00');
+  const END_TIME = toTime('Friday, May 4, 2018 0:00:00 AM GMT+00:00');
   const COMPANY_DIST = 34;
 
   // add 5 whitelisted participants
@@ -54,7 +53,7 @@ contract('VervFluxCrowdsale', function(accounts) {
     assert.equal(wallet, addresses.wallet, 'Wrong wallet address');
     assert.equal(companyWallet, addresses.companyWallet, 'Wrong company wallet address');
     assert.equal(tokenName, 'Verv Flux', 'Wrong token name');
-    assert.equal(tokenSymbol, 'FLX', 'Wrong token symbol');
+    assert.equal(tokenSymbol, 'VLUX', 'Wrong token symbol');
     assert.equal(tokenDecimals.toString(10), '18', 'Wrong token decimals');
     assert.equal(tokenMintingFinished, false, 'Wrong token minting status');
     assert.equal(tokenOwner, crowdsale.address, 'Wrong token owner');
@@ -82,16 +81,38 @@ contract('VervFluxCrowdsale', function(accounts) {
     assert.instanceOf(investorError, Error, 'Investor was able to buy tokens in presale');
   });
 
-  it('Check investor whitelist', async function() {
+  it('Check investors whitelist and unwhitelist', async function() {
     const crowdsale = await VervFluxCrowdsale.deployed();
 
+    await crowdsale.changeWhitelistParticipantsStatus(whitelisted, true, { from: addresses.owner, gas: 200000 });
     for (let investor of whitelisted) {
-      await crowdsale.whitelistParticipant(investor, { from: addresses.owner });
-
       const isWhitelisted = await crowdsale.isParticipantWhitelisted.call(investor);
 
       assert.equal(isWhitelisted, true, 'Unable to whitelist investor');
     }
+
+    await crowdsale.changeWhitelistParticipantsStatus(whitelisted, false, { from: addresses.owner, gas: 200000 });
+    for (let investor of whitelisted) {
+      const isWhitelisted = await crowdsale.isParticipantWhitelisted.call(investor);
+
+      assert.equal(isWhitelisted, false, 'Unable to unwhitelist investor');
+    }
+  });
+
+  it('Check whitelist status change function gas limit', async function() {
+    const crowdsale = await VervFluxCrowdsale.deployed();
+
+    let overLimitError = null;
+
+    try {
+      await crowdsale.changeWhitelistParticipantsStatus(whitelisted, true, { from: addresses.owner, gas: 5000000 });
+    } catch(e) {
+      overLimitError = e;
+    }
+
+    await crowdsale.changeWhitelistParticipantsStatus(whitelisted, true, { from: addresses.owner, gas: 200000 });
+
+    assert.instanceOf(overLimitError, Error, 'Could call whitelist status change function with gas amount over limit');
   });
 
   it('Check rate update', async function() {
@@ -119,15 +140,21 @@ contract('VervFluxCrowdsale', function(accounts) {
     const snapshot = await evm.snapshot();
 
     const newStartTime = START_TIME + 1000;
+    const pastStartTime = toTime('Thursday, March 1, 2018 0:00:00 AM GMT+00:00');
     const crowdsale = await VervFluxCrowdsale.deployed();
     let nonOwnerError = null;
     let equalEndTimeError = null;
+    let pastStartTimeError = null;
 
     await crowdsale.updateStartTime(newStartTime, { from: addresses.owner });
 
     try {
       await crowdsale.updateStartTime(newStartTime, { from: addresses.wallet });
     } catch (e) { nonOwnerError = e }
+
+    try {
+      await crowdsale.updateStartTime(pastStartTime, { from: addresses.wallet });
+    } catch (e) { pastStartTimeError = e }
 
     try {
       await crowdsale.updateStartTime(END_TIME, { from: addresses.owner });
@@ -137,6 +164,7 @@ contract('VervFluxCrowdsale', function(accounts) {
 
     assert.equal(startTime.toString(10), newStartTime, 'Unable to update start time');
     assert.instanceOf(nonOwnerError, Error, 'Anyone can start time');
+    assert.instanceOf(pastStartTimeError, Error, 'Start time can be set to date in the past');
     assert.instanceOf(equalEndTimeError, Error, 'Start time can exceed end time');
 
     await evm.revert(snapshot);
@@ -169,7 +197,7 @@ contract('VervFluxCrowdsale', function(accounts) {
     await evm.revert(snapshot);
   });
 
-  it('Check presale investment', async function() {
+  it('Check presale investment and wei raised', async function() {
     const crowdsale = await VervFluxCrowdsale.deployed();
     const tokenAddress = await crowdsale.token.call();
     const token = await VervFluxToken.at(tokenAddress);
@@ -188,17 +216,6 @@ contract('VervFluxCrowdsale', function(accounts) {
       { from: addresses.owner }
     );
 
-    const walletBalanceBefore = await web3.eth.getBalance(addresses.wallet);
-
-    await crowdsale.disbursePreBuyersLkdContributions(
-      investor,
-      MAX_PRESALE_CONTRIBUTION_RATE,
-      saft.vesting,
-      { from: addresses.owner, value: saft.ether }
-    );
-
-    const walletBalance = await web3.eth.getBalance(addresses.wallet);
-
     try {
       await crowdsale.distributePreBuyersLkdRewards(
         investor,
@@ -207,24 +224,6 @@ contract('VervFluxCrowdsale', function(accounts) {
         { from: addresses.wallet }
       );
     } catch (e) { errorRewards = e }
-
-    try {
-      await crowdsale.disbursePreBuyersLkdContributions(
-        investor,
-        MAX_PRESALE_CONTRIBUTION_RATE + 1,
-        saft.vesting,
-        { from: addresses.wallet, value: saft.ether }
-      );
-    } catch (e) { errorContributions = e }
-
-    try {
-      await crowdsale.disbursePreBuyersLkdContributions(
-        investor,
-        8001,
-        saft.vesting,
-        { from: addresses.wallet, value: saft.ether }
-      );
-    } catch (e) { errorContributionRate = e }
 
     const vestingAddress = await crowdsale.vestingContract.call(investor);
     const vesting = await TokenVesting.at(vestingAddress);
@@ -236,7 +235,7 @@ contract('VervFluxCrowdsale', function(accounts) {
     const revocable = await vesting.revocable.call();
 
     testVesting.contract = vesting;
-    testVesting.tokens = toBigNumber(saft.tokens).mul(2); // we have invested twice
+    testVesting.tokens = toBigNumber(saft.tokens);
     testVesting.investor = investor;
 
     // allow an error marge of 30 seconds
@@ -244,12 +243,9 @@ contract('VervFluxCrowdsale', function(accounts) {
     assert.equal(start.toString(10), END_TIME + SEC_3MO, 'Wrong vesting start time');
     assert.equal(revocable, false, 'Tokens vesting is revocable');
     assert.equal(duration.toString(10), SEC_3MO * 3, 'Wrong vesting duration');
-    assert.equal(walletBalance.toString(10), walletBalanceBefore.add(saft.ether).toString(10), 'Sent ether was not transferred to the wallet');
-    assert.equal(balance.toString(10), toBigNumber(saft.tokens).mul(2).toString(10), 'Wrong amount of tokens transfered');
+    assert.equal(balance.toString(10), toBigNumber(saft.tokens).toString(10), 'Wrong amount of tokens transfered');
     assert.equal(userBalance.toString(10), '0', 'Tokens are transfered to investor directly');
     assert.instanceOf(errorRewards, Error, 'Anyone is able to disburse presale investment (reward)');
-    assert.instanceOf(errorContributions, Error, 'Anyone is able to disburse presale investment (contribution)');
-    assert.instanceOf(errorContributionRate, Error, `A bigger than ${ MAX_PRESALE_CONTRIBUTION_RATE } rate can be applied for presale contributions`);
   });
 
   it('Check crowdsale start state', async function() {
@@ -266,18 +262,22 @@ contract('VervFluxCrowdsale', function(accounts) {
   it('Check cap update', async function() {
     const crowdsale = await VervFluxCrowdsale.deployed();
   
-    const newCap = toWei(parseInt(cfg.cap) + 10, 'ether');
+    const newCapIncrease = toWei(parseInt(cfg.cap) + 10, 'ether');
+    const newCapDecrease = toWei(parseInt(cfg.cap) - 10, 'ether');
     let error = null;
 
-    await crowdsale.updateCap(newCap, { from: addresses.owner });
+    await crowdsale.updateCap(newCapIncrease, { from: addresses.owner });
+    const capAfterIncrease = await crowdsale.cap.call();
+
+    await crowdsale.updateCap(newCapDecrease, { from: addresses.owner });
+    const capAfterDecrease = await crowdsale.cap.call();
 
     try {
-      await crowdsale.updateCap(newCap, { from: addresses.wallet });
+      await crowdsale.updateCap(newCapIncrease, { from: addresses.wallet });
     } catch (e) { error = e }
 
-    const cap = await crowdsale.cap.call();
-
-    assert.equal(cap.toString(10), newCap, 'Unable to update cap');
+    assert.equal(capAfterIncrease.toString(10), newCapIncrease, 'Unable to increase cap');
+    assert.equal(capAfterDecrease.toString(10), newCapDecrease, 'Unable to decrease cap');
     assert.instanceOf(error, Error, 'Anyone can update cap');
   });
 
@@ -287,22 +287,30 @@ contract('VervFluxCrowdsale', function(accounts) {
     const token = await VervFluxToken.at(tokenAddress);
 
     const day1Investment = toBigNumber(toWei(5, 'ether'));
+    const day1TotalInvestment = toBigNumber(toWei(10, 'ether'));
     const investment = toBigNumber(toWei(13, 'ether'));
+
     const investor1 = whitelisted.shift(); // whitelisted for day 1, limited to 10 ETH
     const investor2 = whitelisted.shift(); // whitelisted for day 2
     const investor3 = whitelisted.shift(); // whitelisted for day 3
-    const investor4 = identity.next(); // not whitelisted for day 3
-    const investor5 = identity.next(); // not whitelisted for day 4
+    const investor4 = identity.next(); // not whitelisted
 
-    let day1ExceedInvestmentError = null;
+    let day1ExceedOnetimeInvestmentError = null;
+    let day1ExceedTotalInvestmentError = null;
     let day1NonWhitelistedError = null;
     let day2NonWhitelistedError = null;
+    let day3NonWhitelistedError = null;
 
     await crowdsale.buyTokens(investor1, { from: investor1, value: day1Investment });
 
     try {
       await crowdsale.buyTokens(investor1, { from: investor1, value: investment });
-    } catch (e) { day1ExceedInvestmentError = e }
+    } catch (e) { day1ExceedOnetimeInvestmentError = e }
+
+    await crowdsale.buyTokens(investor1, { from: investor1, value: day1Investment });
+    try {
+      await crowdsale.buyTokens(investor1, { from: investor1, value: day1Investment });
+    } catch (e) { day1ExceedTotalInvestmentError = e }
 
     try {
       await crowdsale.buyTokens(investor4, { from: investor4, value: day1Investment });
@@ -321,27 +329,24 @@ contract('VervFluxCrowdsale', function(accounts) {
     await evm.timeTravelTo(START_TIME + (60 * 60 * 24) + (60 * 60 * 24) + 10);
 
     await web3.eth.sendTransaction({ from: investor3, to: crowdsale.address, value: investment, gas: 400000 });
-    await web3.eth.sendTransaction({ from: investor4, to: crowdsale.address, value: investment, gas: 400000 });
-
-    // travel to day 4
-    await evm.timeTravelTo(START_TIME + (60 * 60 * 24) + (60 * 60 * 24) + (60 * 60 * 24) + 10);
-
-    await crowdsale.buyTokens(investor5, { from: investor5, value: investment });
+    
+    try {
+      await crowdsale.buyTokens(investor4, { from: investor4, value: investment });
+    } catch (e) { day3NonWhitelistedError = e }
 
     const investor1Balance = await token.balanceOf.call(investor1);
     const investor2Balance = await token.balanceOf.call(investor2);
     const investor3Balance = await token.balanceOf.call(investor3);
     const investor4Balance = await token.balanceOf.call(investor4);
-    const investor5Balance = await token.balanceOf.call(investor5);
 
-    assert.equal(investor1Balance.toString(10), day1Investment.mul(DAY1_RATE).toString(10), 'Wrong amount of tokens transfered in day 1');
+    assert.equal(investor1Balance.toString(10), day1TotalInvestment.mul(DAY1_RATE).toString(10), 'Wrong amount of tokens transfered in day 1');
     assert.equal(investor2Balance.toString(10), investment.mul(DAY2_RATE).toString(10), 'Wrong amount of tokens transfered in day 2');
-    assert.equal(investor3Balance.toString(10), investment.mul(DAY3_RATE).toString(10), 'Wrong amount of tokens transfered in day 3');
-    assert.equal(investor4Balance.toString(10), investment.mul(DAY3_RATE).toString(10), 'Wrong amount of tokens transfered to non whitelisted participant in day 3');
-    assert.equal(investor5Balance.toString(10), investment.mul(RATE).toString(10), 'Wrong amount of tokens transfered in day 4');
-    assert.instanceOf(day1ExceedInvestmentError, Error, 'Investor is able to send more than 10 ETH in day 1');
+    assert.equal(investor3Balance.toString(10), investment.mul(RATE).toString(10), 'Wrong amount of tokens transfered in day 3');
+    assert.instanceOf(day1ExceedOnetimeInvestmentError, Error, 'Investor is able to send more than 10 ETH in day 1');
+    assert.instanceOf(day1ExceedTotalInvestmentError, Error, 'Investor is able to send more than 10 ETH in day 1 summarily');
     assert.instanceOf(day1NonWhitelistedError, Error, 'Non whitelisted participant can invest in day 1');
     assert.instanceOf(day2NonWhitelistedError, Error, 'Non whitelisted participant can invest in day 2');
+    assert.instanceOf(day3NonWhitelistedError, Error, 'Non whitelisted participant can invest in day 3');
   });
 
   it('Check investment while paused', async function() {
@@ -374,6 +379,27 @@ contract('VervFluxCrowdsale', function(accounts) {
     assert.instanceOf(investmentError, Error, 'Participant can invest while sale paused');
   });
 
+  it('Check transfer pause management', async function() {
+    const crowdsale = await VervFluxCrowdsale.deployed();
+    const newPauseManager = identity.next();
+
+    let transferError = null;
+    let transferFromOldManagerError = null;
+
+    try {
+      await crowdsale.transferPauseManagement(newPauseManager, {from: newPauseManager});
+    } catch(e) {
+      transferError = e;
+    }
+
+    await crowdsale.transferPauseManagement(newPauseManager, {from: addresses.owner});
+
+    const pauseManager = await crowdsale.pauseManager.call();
+
+    assert.equal(pauseManager, newPauseManager, 'Pause manager did not set correctly.');
+    assert.instanceOf(transferError, Error, 'Anyone can transfer pause management role');
+  })
+
   it('Check finalization by cap', async function() {
     const snapshot = await evm.snapshot();
 
@@ -381,7 +407,7 @@ contract('VervFluxCrowdsale', function(accounts) {
     const tokenAddress = await crowdsale.token.call();
     const token = await VervFluxToken.at(tokenAddress);
 
-    const investor = identity.next();
+    const investor = whitelisted.shift();
     const cap = await crowdsale.cap.call();
     const weiRaisedBefore = await crowdsale.weiRaised.call();
     const investment = cap.sub(weiRaisedBefore);
@@ -430,7 +456,7 @@ contract('VervFluxCrowdsale', function(accounts) {
     const mintingFinished = await token.mintingFinished.call();
     const companyBalance = await token.balanceOf.call(addresses.companyWallet);
 
-    assert.isAbove(totalTokens.toString(10), totalTokensBefore.toString(10), 'Wrong amount of tokens distributed');
+    assert.isAbove(parseInt(totalTokens.toString(10)), parseInt(totalTokensBefore.toString(10)), 'Wrong amount of tokens distributed');
     assert.approximately(parseFloat(fromWei(companyBalance).toString(10)), parseFloat(fromWei(totalTokens.div(100).mul(COMPANY_DIST)).toString(10)), MAX_DIST_ERROR_MARGE, 'Wrong amount of tokens distributed to company wallet');
     assert.instanceOf(secondFinalizeError, Error, 'Sale can be finalized several times');
     assert.instanceOf(investmentError, Error, 'Participant can invest after sale end');

@@ -213,6 +213,9 @@ const VestingDuration = {
   Mo12: '3',
 };
 
+const START_TIME = toTime('Tuesday, May 1, 2018 0:00:00 AM GMT+00:00');
+const END_TIME = toTime('Friday, May 4, 2018 0:00:00 AM GMT+00:00');
+
 module.exports = {
   toWei, fromWei, toBigNumber,
   logEnvVar, logAddress, logTx,
@@ -222,4 +225,5 @@ module.exports = {
   evm: web3 => new EVMHelper(web3),
   identity: accounts => new AccountsHelper(accounts, _accountsToSkip),
   gas, accounts, cfg, Stages, VestingDuration,
+  START_TIME, END_TIME,
 };

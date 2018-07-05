@@ -12,6 +12,8 @@ module.exports = (deployer, network, accounts) => {
     addresses.companyWallet,
     addresses.wallet,
     util.toWei(util.cfg.cap, 'ether'),
+    util.START_TIME,
+    util.END_TIME,
     { gas: util.gas.amount.VervFluxCrowdsale }
   );
 };

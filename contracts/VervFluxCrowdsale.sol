@@ -26,11 +26,13 @@ contract VervFluxCrowdsale is CappedCrowdsale, Ownable, Pausable {
     uint256 constant public MAX_ALLOWED_FIRST_DAY_INVESTMENT = 10 ether; // 10 ETH allowed during 1'st day
     uint256 constant public PRESALE_LOCKUP_PERIOD = 1 years / 4; // 3 months lockup
     uint256 constant public MAX_PRESALE_RATE = 8000;
+    uint8 constant public COMPANY_RETAIN_PERCENT = 34;
+    uint8 constant public INVESTOR_MARGIN = 66;
+    uint256 constant public MAX_WHITELIST_TRANSACTION_GAS_AMOUNT = 4000000;
+    uint256 constant public MAX_GAS_PRICE = 20000000000;
 
     // Predefined value mappings
-    mapping (uint => uint256) public vestingDurations;
-    mapping (address => uint256) public finalizationRetainStrategy;
-    mapping (uint => uint256) public bonuses;
+    mapping (uint8 => uint256) public vestingDurations;
 
     // Whitelisted participants
     mapping (address => bool) public whitelist;
@@ -42,11 +44,17 @@ contract VervFluxCrowdsale is CappedCrowdsale, Ownable, Pausable {
     Stages public stage = Stages.PreSale;
     address public companyWallet;
     bool public isFinalized = false;
+    mapping (address => uint256) public firstDaySaleRecords;
+    uint256 public preSaleWeiRaised;
     
     event Finalized();
     event WhitelistParticipant(address indexed investor);
+    event UnwhitelistParticipant(address indexed investor);
     event CapUpdated(uint256 cap, uint256 newCap);
-    event StageUpdated(uint stage, uint newStage);
+    event StageUpdated(uint8 stage, uint8 newStage);
+    event PauseManagementTransferred(address indexed previousManager, address indexed newManager);
+
+    address public pauseManager;
 
     // Check the stage to be the specified one
     modifier atStage(Stages _stage) {
@@ -56,7 +64,7 @@ contract VervFluxCrowdsale is CappedCrowdsale, Ownable, Pausable {
 
     // Check the stage to be before specified one
     modifier beforeStage(Stages _stage) {
-        require(uint(stage) < uint(_stage));
+        require(uint8(stage) < uint8(_stage));
         _;
     }
 
@@ -69,6 +77,26 @@ contract VervFluxCrowdsale is CappedCrowdsale, Ownable, Pausable {
         transition();
     }
 
+    modifier runsForThreeDays(uint256 _startTime, uint256 _endTime) {
+        require(_endTime == _startTime + 3 days);
+        _;
+    }
+
+    modifier underGasLimit() {
+        require(msg.gas <= MAX_WHITELIST_TRANSACTION_GAS_AMOUNT);
+        _;
+    }
+
+    modifier underGasPrice() {
+        require(tx.gasprice <= MAX_GAS_PRICE);
+        _;
+    }
+
+    modifier onlyPauseManager() {
+        require(msg.sender == pauseManager);
+        _;
+    }
+
     // Constructor
     // _owner = (TBD)
     // _companyWallet = (TBD)
@@ -78,12 +106,15 @@ contract VervFluxCrowdsale is CappedCrowdsale, Ownable, Pausable {
         address _owner,
         address _companyWallet,
         address _wallet, 
-        uint256 _cap
+        uint256 _cap,
+        uint256 _startTime,
+        uint256 _endTime
     )
         public
+        runsForThreeDays(_startTime, _endTime)
         Crowdsale(
-            1522454400, // startTime (Saturday, March 31, 2018 12:00:00 AM)
-            1522800000, // endTime (Wednesday, April 4, 2018 12:00:00 AM)
+            _startTime, // startTime (Saturday, March 31, 2018 12:00:00 AM)
+            _endTime, // endTime (Wednesday, April 4, 2018 12:00:00 AM)
             2000, // rate
             _wallet // wallet
         )
@@ -94,15 +125,13 @@ contract VervFluxCrowdsale is CappedCrowdsale, Ownable, Pausable {
 
         owner = _owner;
         companyWallet = _companyWallet;
-
-        // Define tokens percentage retained by company
-        finalizationRetainStrategy[companyWallet] = 34;
+        pauseManager = _owner;
 
         // Define vesting periods
-        vestingDurations[uint(VestingDuration.Mo3)] = 1 years / 4;
-        vestingDurations[uint(VestingDuration.Mo6)] = 1 years / 2;
-        vestingDurations[uint(VestingDuration.Mo9)] = 1 years / 4 * 3;
-        vestingDurations[uint(VestingDuration.Mo12)] = 1 years;
+        vestingDurations[uint8(VestingDuration.Mo3)] = 1 years / 4;
+        vestingDurations[uint8(VestingDuration.Mo6)] = 1 years / 2;
+        vestingDurations[uint8(VestingDuration.Mo9)] = 1 years / 4 * 3;
+        vestingDurations[uint8(VestingDuration.Mo12)] = 1 years;
     }
 
     /************ Public functionality ************/
@@ -112,22 +141,22 @@ contract VervFluxCrowdsale is CappedCrowdsale, Ownable, Pausable {
         return whitelist[investor];
     }
 
-    // @return true if crowdsale event has ended
-    function hasEnded() public view returns (bool) {
-        return stage == Stages.SaleOver;
-    }
-
     // Invest function
     function buyTokens(address beneficiary)
         public
         payable
         whenNotPaused
+        underGasPrice
         transitionGuard
         atStage(Stages.Sale)
     {
         require(validInvestment(beneficiary));
 
         super.buyTokens(beneficiary);
+
+        if (now < (startTime + 1 days)) {
+            firstDaySaleRecords[beneficiary] = firstDaySaleRecords[beneficiary].add(msg.value);
+        }
     }
 
     // Properly finalize crowdsale
@@ -141,14 +170,12 @@ contract VervFluxCrowdsale is CappedCrowdsale, Ownable, Pausable {
 
         isFinalized = true;
 
-        uint256 campanyRetainPerc = finalizationRetainStrategy[companyWallet];
         uint256 tokensDistributed = token.totalSupply();
-        uint256 investorsMarge = 100 - campanyRetainPerc;
 
         require(tokensDistributed > 0);
 
-        uint256 totalTokens = tokensDistributed / investorsMarge * 100;
-        uint256 companyDist = totalTokens * campanyRetainPerc / 100;
+        uint256 totalTokens = tokensDistributed / INVESTOR_MARGIN * 100;
+        uint256 companyDist = totalTokens * COMPANY_RETAIN_PERCENT / 100;
 
         token.mint(companyWallet, companyDist);
 
@@ -162,6 +189,19 @@ contract VervFluxCrowdsale is CappedCrowdsale, Ownable, Pausable {
     }
 
     /************ Owner functionality ************/
+
+    // Transfer pause menegement
+    function transferPauseManagement(address newManager)
+        public
+        onlyPauseManager
+    {
+        require(newManager != 0x0);
+
+        address previousManager = pauseManager;
+        pauseManager = newManager;
+
+        PauseManagementTransferred(previousManager, newManager);
+    }
 
     // Update rate
     function updateRate(uint256 newRate)
@@ -183,6 +223,7 @@ contract VervFluxCrowdsale is CappedCrowdsale, Ownable, Pausable {
         atStage(Stages.PreSale)
     {
         require(newStartTime > 0);
+        require(newStartTime > now);
         require(newStartTime < endTime);
 
         startTime = newStartTime;
@@ -208,7 +249,7 @@ contract VervFluxCrowdsale is CappedCrowdsale, Ownable, Pausable {
         transitionGuard
         beforeStage(Stages.SaleOver)
     {
-        require(newCap > cap);
+        require(newCap > weiRaised);
 
         uint256 oldCap = cap;
         cap = newCap;
@@ -217,46 +258,23 @@ contract VervFluxCrowdsale is CappedCrowdsale, Ownable, Pausable {
     }
 
     // Whitelist participant
-    function whitelistParticipant(address investor)
+    function changeWhitelistParticipantsStatus(address[] investors, bool status)
         public
         whenNotPaused
         onlyOwner
+        underGasLimit
         transitionGuard
         atStage(Stages.PreSale)
     {
-        require(investor != 0x0);
+        require(investors.length > 0);
 
-        whitelist[investor] = true;
+        for(uint256 i = 0; i < investors.length; i++) {
+            require(investors[i] != 0x0);
+            whitelist[investors[i]] = status;
 
-        WhitelistParticipant(investor);
+            WhitelistParticipant(investors[i]);
+        }
     }
-
-    // Disburse presale investment with real funds sent
-    function disbursePreBuyersLkdContributions(
-        address beneficiary,
-        uint256 rate,
-        VestingDuration vestingDuration
-    )
-        public
-        payable
-        onlyOwner
-        transitionGuard
-        atStage(Stages.PreSale)
-    {
-        require(msg.value > 0);
-        require(rate > 0);
-        require(rate <= MAX_PRESALE_RATE);
-
-        uint256 tokensAmount = msg.value * rate;
-
-        distributePreBuyersLkdRewards(
-            beneficiary,
-            tokensAmount,
-            vestingDuration
-        );
-
-        forwardFunds();
-    }    
 
     // Disburse presale investment
     function distributePreBuyersLkdRewards(
@@ -273,7 +291,7 @@ contract VervFluxCrowdsale is CappedCrowdsale, Ownable, Pausable {
         require(beneficiary != 0x0);
         require(tokensAmount > 0);
         
-        uint256 duration = vestingDurations[uint(vestingDuration)];
+        uint256 duration = vestingDurations[uint8(vestingDuration)];
 
         require(duration > 0);
 
@@ -288,6 +306,7 @@ contract VervFluxCrowdsale is CappedCrowdsale, Ownable, Pausable {
         }
 
         token.mint(address(vestingContracts[beneficiary]), tokensAmount);
+        preSaleWeiRaised = preSaleWeiRaised.add(tokensAmount.div(rate));
     }
 
     /************ Internal functionality ************/
@@ -299,7 +318,7 @@ contract VervFluxCrowdsale is CappedCrowdsale, Ownable, Pausable {
             nextStage();
         }
 
-        // If sale running and wither cap or endTime is reached
+        // If sale running and either cap or endTime is reached
         if (stage == Stages.Sale && super.hasEnded()) {
             nextStage();
         }
@@ -310,21 +329,19 @@ contract VervFluxCrowdsale is CappedCrowdsale, Ownable, Pausable {
         return new VervFluxToken();
     }
 
+    function validTotalFirstDayAmount(address beneficiary) internal view returns (bool) {
+        return (firstDaySaleRecords[beneficiary] + msg.value) <= 10 ether;
+    }
+
     // Validate investment
     function validInvestment(address beneficiary) internal view returns (bool) {
-        bool allowedToInvest = false;
+        bool allowedToInvest = isParticipantWhitelisted(beneficiary);
         bool validAmount = false;
 
-        if (now < (startTime + 2 days)) { // Allow only whitelisted addresses to invest first 2 days
-            allowedToInvest = isParticipantWhitelisted(beneficiary);
-
-            if (now < (startTime + 1 days)) { // Allow max. investment of 10 ETH on first day
-                validAmount = msg.value <= MAX_ALLOWED_FIRST_DAY_INVESTMENT;
-            } else {
-                validAmount = true;
-            }
+        if (now < (startTime + 1 days)) { // Allow max. investment of 10 ETH on first day
+            allowedToInvest = allowedToInvest && validTotalFirstDayAmount(beneficiary);
+            validAmount = msg.value <= MAX_ALLOWED_FIRST_DAY_INVESTMENT;
         } else {
-            allowedToInvest = true;
             validAmount = true;
         }
 
@@ -336,11 +353,9 @@ contract VervFluxCrowdsale is CappedCrowdsale, Ownable, Pausable {
         uint256 finalRate = rate;
 
         if (now < (startTime + 1 days)) {
-            finalRate = rate + (rate * 150 / 1000); // 15% bonus
+            finalRate = rate + (rate * 5 / 100); // 15% bonus
         } else if (now < (startTime + 2 days)) {
-            finalRate = rate + (rate * 125 / 1000); // 12.5% bonus
-        } else if (now < (startTime + 3 days)) {
-            finalRate = rate + (rate * 100 / 1000); // 10% bonus
+            finalRate = rate + (rate * 25 / 1000); // 12.5% bonus
         }
 
         return weiAmount * finalRate;
@@ -348,8 +363,8 @@ contract VervFluxCrowdsale is CappedCrowdsale, Ownable, Pausable {
 
     // Transit to the next stage
     function nextStage() internal {
-        uint oldStage = uint(stage);
-        uint newStage = oldStage + 1;
+        uint8 oldStage = uint8(stage);
+        uint8 newStage = oldStage + 1;
 
         stage = Stages(newStage);
 

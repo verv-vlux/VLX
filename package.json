@@ -35,7 +35,7 @@
     "etherscan-link": "^1.0.2",
     "ganache-cli": "6.1.0-beta.0",
     "solco": "^0.2.0",
-    "truffle": "^4.0.6",
+    "truffle": "4.0.6",
     "web3": "^0.20.5",
     "zeppelin-solidity": "1.6.0"
   }
