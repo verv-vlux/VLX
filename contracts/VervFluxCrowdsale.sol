@@ -49,7 +49,6 @@ contract VervFluxCrowdsale is CappedCrowdsale, Ownable, Pausable {
     
     event Finalized();
     event WhitelistParticipant(address indexed investor);
-    event UnwhitelistParticipant(address indexed investor);
     event CapUpdated(uint256 cap, uint256 newCap);
     event StageUpdated(uint8 stage, uint8 newStage);
     event PauseManagementTransferred(address indexed previousManager, address indexed newManager);
@@ -101,7 +100,7 @@ contract VervFluxCrowdsale is CappedCrowdsale, Ownable, Pausable {
     // _owner = (TBD)
     // _companyWallet = (TBD)
     // _wallet = (TBD)
-    // _cap = £20M * ETH/£ rate
+    // _cap = amount of wei equivalent to £20M
     function VervFluxCrowdsale(
         address _owner,
         address _companyWallet,
@@ -188,7 +187,7 @@ contract VervFluxCrowdsale is CappedCrowdsale, Ownable, Pausable {
     }
 
     /************ Owner functionality ************/
-    // Transfer pause menegement
+    // Transfer pause management
     function transferPauseManagement(address newManager)
         public
         onlyPauseManager
