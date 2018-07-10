@@ -29,6 +29,7 @@ contract VervFluxCrowdsale is CappedCrowdsale, Ownable, Pausable {
     uint8 constant public INVESTOR_MARGIN = 70;
     uint256 constant public MAX_WHITELIST_TRANSACTION_GAS_AMOUNT = 4000000;
     uint256 constant public MAX_GAS_PRICE = 50000000000; // 50 gwei
+    uint256 constant public END_TIME_LIMIT = 1546344000; //hard upper limit for end time - 1 Jan 2019
 
     // Predefined value mappings
     mapping (uint8 => uint256) public vestingDurations;
@@ -134,7 +135,6 @@ contract VervFluxCrowdsale is CappedCrowdsale, Ownable, Pausable {
     }
 
     /************ Public functionality ************/
-
     // Check if participant was whitelisted
     function isParticipantWhitelisted(address investor) public view returns (bool) {
         return whitelist[investor];
@@ -188,7 +188,6 @@ contract VervFluxCrowdsale is CappedCrowdsale, Ownable, Pausable {
     }
 
     /************ Owner functionality ************/
-
     // Transfer pause menegement
     function transferPauseManagement(address newManager)
         public
@@ -236,6 +235,7 @@ contract VervFluxCrowdsale is CappedCrowdsale, Ownable, Pausable {
         atStage(Stages.PreSale)
     {
         require(newEndTime > startTime);
+        require(newEndTime < END_TIME_LIMIT);
 
         endTime = newEndTime;
     }
@@ -266,7 +266,7 @@ contract VervFluxCrowdsale is CappedCrowdsale, Ownable, Pausable {
     {
         require(investors.length > 0);
 
-        for(uint256 i = 0; i < investors.length; i++) {
+        for (uint256 i = 0; i < investors.length; i++) {
             require(investors[i] != 0x0);
             whitelist[investors[i]] = status;
 
@@ -308,7 +308,6 @@ contract VervFluxCrowdsale is CappedCrowdsale, Ownable, Pausable {
     }
 
     /************ Internal functionality ************/
-
     // Make the stage transition if the case
     function transition() internal {
         // If it's time to start the sale
