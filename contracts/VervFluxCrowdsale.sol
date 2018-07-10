@@ -235,7 +235,6 @@ contract VervFluxCrowdsale is CappedCrowdsale, Ownable, Pausable {
         transitionGuard
         atStage(Stages.PreSale)
     {
-        require(newEndTime > 0);
         require(newEndTime > startTime);
 
         endTime = newEndTime;
