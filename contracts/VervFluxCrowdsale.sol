@@ -25,11 +25,10 @@ contract VervFluxCrowdsale is CappedCrowdsale, Ownable, Pausable {
     // Invariants
     uint256 constant public MAX_ALLOWED_FIRST_DAY_INVESTMENT = 10 ether; // 10 ETH allowed during 1'st day
     uint256 constant public PRESALE_LOCKUP_PERIOD = 1 years / 4; // 3 months lockup
-    uint256 constant public MAX_PRESALE_RATE = 8000;
-    uint8 constant public COMPANY_RETAIN_PERCENT = 34;
-    uint8 constant public INVESTOR_MARGIN = 66;
+    uint8 constant public COMPANY_RETAIN_PERCENT = 30;
+    uint8 constant public INVESTOR_MARGIN = 70;
     uint256 constant public MAX_WHITELIST_TRANSACTION_GAS_AMOUNT = 4000000;
-    uint256 constant public MAX_GAS_PRICE = 20000000000;
+    uint256 constant public MAX_GAS_PRICE = 50000000000; // 50 gwei
 
     // Predefined value mappings
     mapping (uint8 => uint256) public vestingDurations;
