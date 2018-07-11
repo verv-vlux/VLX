@@ -348,9 +348,9 @@ contract VervFluxCrowdsale is CappedCrowdsale, Ownable, Pausable {
         uint256 finalRate = rate;
 
         if (now < (startTime + 1 days)) {
-            finalRate = rate + (rate * 5 / 100); // 15% bonus
+            finalRate = rate + (rate * 5 / 100); // 5% bonus
         } else if (now < (startTime + 2 days)) {
-            finalRate = rate + (rate * 25 / 1000); // 12.5% bonus
+            finalRate = rate + (rate * 25 / 1000); // 2.5% bonus
         }
 
         return weiAmount * finalRate;
