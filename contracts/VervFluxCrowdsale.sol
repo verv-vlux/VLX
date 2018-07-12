@@ -172,8 +172,8 @@ contract VervFluxCrowdsale is CappedCrowdsale, Ownable, Pausable {
 
         require(tokensDistributed > 0);
 
-        uint256 totalTokens = tokensDistributed / INVESTOR_MARGIN * 100;
-        uint256 companyDist = totalTokens * COMPANY_RETAIN_PERCENT / 100;
+        uint256 totalTokens = tokensDistributed.mul(100).div(INVESTOR_MARGIN);
+        uint256 companyDist = totalTokens.mul(COMPANY_RETAIN_PERCENT).div(100);
 
         token.mint(companyWallet, companyDist);
 
@@ -348,9 +348,9 @@ contract VervFluxCrowdsale is CappedCrowdsale, Ownable, Pausable {
         uint256 finalRate = rate;
 
         if (now < (startTime + 1 days)) {
-            finalRate = rate + (rate * 5 / 100); // 5% bonus
+            finalRate = rate + (rate.mul(5).div(100)); // 5% bonus
         } else if (now < (startTime + 2 days)) {
-            finalRate = rate + (rate * 25 / 1000); // 2.5% bonus
+            finalRate = rate + (rate.mul(25).div(1000)); // 2.5% bonus
         }
 
         return weiAmount * finalRate;
