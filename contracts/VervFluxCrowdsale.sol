@@ -106,14 +106,12 @@ contract VervFluxCrowdsale is CappedCrowdsale, Ownable, Pausable {
         address _companyWallet,
         address _wallet, 
         uint256 _cap,
-        uint256 _startTime,
-        uint256 _endTime
+        uint256 _startTime
     )
         public
-        runsForThreeDays(_startTime, _endTime)
         Crowdsale(
-            _startTime, // startTime (Saturday, March 31, 2018 12:00:00 AM)
-            _endTime, // endTime (Wednesday, April 4, 2018 12:00:00 AM)
+            _startTime, // startTime (Wednesday, July 4, 2018 4:00:00 PM UTC)
+            _startTime + (24 hours * 3), // endTime (Saturday, July 7, 2018 4:00:00 PM UTC)
             2000, // rate
             _wallet // wallet
         )
