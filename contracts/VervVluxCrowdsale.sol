@@ -100,7 +100,7 @@ contract VervVluxCrowdsale is CappedCrowdsale, Ownable, Pausable {
     // _owner = (TBD)
     // _companyWallet = (TBD)
     // _wallet = (TBD)
-    // _cap = amount of wei equivalent to £20M
+    // _cap = amount of wei equivalent to £25M
     function VervVluxCrowdsale(
         address _owner,
         address _companyWallet,
@@ -236,7 +236,7 @@ contract VervVluxCrowdsale is CappedCrowdsale, Ownable, Pausable {
         endTime = newEndTime;
     }
 
-    // Update sale cap to keep it £20M
+    // Update sale cap to keep it £25M
     function updateCap(uint256 newCap)
         public
         onlyOwner
