@@ -313,6 +313,17 @@ contract VervFluxCrowdsale is CappedCrowdsale, Ownable, Pausable {
         presaleWeiRaised = presaleWeiRaised.sub(weiAmount);
     }
 
+    /*** Pause manager functionality */
+    function pause() public onlyPauseManager whenNotPaused {
+        paused = true;
+        Pause();
+    }
+
+    function unpause() public onlyPauseManager whenPaused {
+        paused = false;
+        Unpause();
+    }
+
     /************ Internal functionality ************/
     // Make the stage transition if the case
     function transition() internal {
