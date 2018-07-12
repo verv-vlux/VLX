@@ -45,7 +45,7 @@ contract VervFluxCrowdsale is CappedCrowdsale, Ownable, Pausable {
     address public companyWallet;
     bool public isFinalized = false;
     mapping (address => uint256) public firstDaySaleRecords;
-    uint256 public preSaleWeiRaised;
+    uint256 public presaleWeiRaised = 0;
     
     event Finalized();
     event WhitelistParticipant(address indexed investor);
@@ -302,7 +302,14 @@ contract VervFluxCrowdsale is CappedCrowdsale, Ownable, Pausable {
         }
 
         token.mint(address(vestingContracts[beneficiary]), tokensAmount);
-        preSaleWeiRaised = preSaleWeiRaised.add(tokensAmount.div(rate));
+    }
+
+    function increasePresaleWeiRaised(uint256 weiAmount) public onlyOwner {
+        presaleWeiRaised = presaleWeiRaised.add(weiAmount);
+    }
+
+    function decreasePresaleWeiRaised(uint256 weiAmount) public onlyOwner {
+        presaleWeiRaised = presaleWeiRaised.sub(weiAmount);
     }
 
     /************ Internal functionality ************/
