@@ -1,12 +1,12 @@
 pragma solidity 0.4.19;
 
-import "./VervFluxToken.sol";
+import "./VervVluxToken.sol";
 import "zeppelin-solidity/contracts/lifecycle/Pausable.sol";
 import "zeppelin-solidity/contracts/crowdsale/CappedCrowdsale.sol";
 import "zeppelin-solidity/contracts/token/ERC20/TokenVesting.sol";
 
 
-contract VervFluxCrowdsale is CappedCrowdsale, Ownable, Pausable {
+contract VervVluxCrowdsale is CappedCrowdsale, Ownable, Pausable {
     using SafeMath for uint256;
 
     enum Stages {
@@ -101,7 +101,7 @@ contract VervFluxCrowdsale is CappedCrowdsale, Ownable, Pausable {
     // _companyWallet = (TBD)
     // _wallet = (TBD)
     // _cap = amount of wei equivalent to £20M
-    function VervFluxCrowdsale(
+    function VervVluxCrowdsale(
         address _owner,
         address _companyWallet,
         address _wallet, 
@@ -338,7 +338,7 @@ contract VervFluxCrowdsale is CappedCrowdsale, Ownable, Pausable {
 
     // Creates the token to be sold.
     function createTokenContract() internal returns (MintableToken) {
-        return new VervFluxToken();
+        return new VervVluxToken();
     }
 
     function validTotalFirstDayAmount(address beneficiary) internal view returns (bool) {
