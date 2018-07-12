@@ -242,6 +242,7 @@ contract VervFluxCrowdsale is CappedCrowdsale, Ownable, Pausable {
     function updateCap(uint256 newCap)
         public
         onlyOwner
+        whenPaused
         transitionGuard
         beforeStage(Stages.SaleOver)
     {
