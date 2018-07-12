@@ -237,7 +237,22 @@ contract VervVluxCrowdsale is CappedCrowdsale, Ownable, Pausable {
     }
 
     // Update sale cap to keep it £25M
-    function updateCap(uint256 newCap)
+    function increaseCap(uint256 newCap)
+        public
+        onlyOwner
+        transitionGuard
+        beforeStage(Stages.SaleOver)
+    {
+        require(newCap > weiRaised);
+        require(newCap > cap);
+
+        uint256 oldCap = cap;
+        cap = newCap;
+
+        CapUpdated(oldCap, cap);
+    }
+
+    function decreaseCap(uint256 newCap)
         public
         onlyOwner
         whenPaused
@@ -245,12 +260,14 @@ contract VervVluxCrowdsale is CappedCrowdsale, Ownable, Pausable {
         beforeStage(Stages.SaleOver)
     {
         require(newCap > weiRaised);
+        require(newCap < cap);
 
         uint256 oldCap = cap;
         cap = newCap;
 
         CapUpdated(oldCap, cap);
     }
+
 
     // Whitelist participant
     function changeWhitelistParticipantsStatus(address[] investors, bool status)
