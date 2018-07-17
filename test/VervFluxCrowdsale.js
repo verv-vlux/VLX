@@ -67,7 +67,7 @@ contract('VervVluxCrowdsale', function(accounts) {
   });
 
   it('Check an investment in presale fails', async function() {
-    const crowdsale = await VervVluxCrowdsale.deployed();
+    const crowdsale = await VervVluxCrowdsale.deployed();    
 
     let investorError = null;
     const investor = identity.next();
