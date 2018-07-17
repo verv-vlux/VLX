@@ -250,6 +250,29 @@ const addresses = {
     testVesting.tokens = toBigNumber(saft.tokens);
     testVesting.investor = investor;
 
+    let nonOwnerWeiIncrease = null;
+    let nonOwnerWeiDecrease = null;
+
+    try {
+      await crowdsale.increasePresaleWeiRaised(saft.ether, {from: investor})
+    } catch (e) {
+      nonOwnerWeiIncrease = e;
+    }
+
+    await crowdsale.increasePresaleWeiRaised(saft.ether, {from: addresses.owner})
+
+    const amountAfterIncrease = await crowdsale.presaleWeiRaised.call();
+
+    try {
+      await crowdsale.decreasePresaleWeiRaised(saft.ether, {from: investor})
+    } catch (e) {
+      nonOwnerWeiDecrease = e;
+    }
+
+    await crowdsale.decreasePresaleWeiRaised(saft.ether, {from: addresses.owner})
+
+    const amountAfterDecrease = await crowdsale.presaleWeiRaised.call();
+
     // allow an error marge of 30 seconds
     assert.equal(cliff.sub(start).toString(10), '0', 'Wrong vesting cliff');
     assert.equal(start.toString(10), END_TIME + SEC_3MO, 'Wrong vesting start time');
@@ -258,14 +281,22 @@ const addresses = {
     assert.equal(balance.toString(10), toBigNumber(saft.tokens).toString(10), 'Wrong amount of tokens transfered');
     assert.equal(userBalance.toString(10), '0', 'Tokens are transfered to investor directly');
     assert.instanceOf(errorRewards, Error, 'Anyone is able to disburse presale investment (reward)');
+
+    assert.equal(amountAfterIncrease, saft.ether, "Did not update presale wei raised correctly");
+    assert.instanceOf(nonOwnerWeiIncrease, Error, "Anyone can update presale wei raised");
+    assert.equal(amountAfterDecrease, 0, "Did not update presale wei raised correctly");
+    assert.instanceOf(nonOwnerWeiDecrease, Error, "Anyone can update presale wei raised");
   });
 
   it('Check crowdsale start state', async function() {
     const crowdsale = await VervVluxCrowdsale.deployed();
     await evm.timeTravelTo(START_TIME + 10);
 
+    await crowdsale.pause({from: addresses.owner});
+
     await crowdsale.updateCap(toWei(parseInt(cfg.cap) + 1, 'ether'), { from: addresses.owner });
 
+    await crowdsale.unpause({from: addresses.owner});
     const stage = await crowdsale.stage.call();
 
     assert.equal(stage.toString(10), Stages.Sale, 'Wrong stage');
