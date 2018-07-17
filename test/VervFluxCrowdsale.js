@@ -307,7 +307,14 @@ const addresses = {
   
     const newCapIncrease = toWei(parseInt(cfg.cap) + 10, 'ether');
     const newCapDecrease = toWei(parseInt(cfg.cap) - 10, 'ether');
-    let error = null;
+    let updateWhenPausedError = null;
+    let nonOwnerError = null;
+
+    try {
+      await crowdsale.updateCap(newCapIncrease, { from: addresses.owner });
+    } catch (e) { updateWhenPausedError = e }
+
+    await crowdsale.pause({from: addresses.owner});
 
     await crowdsale.updateCap(newCapIncrease, { from: addresses.owner });
     const capAfterIncrease = await crowdsale.cap.call();
@@ -317,11 +324,14 @@ const addresses = {
 
     try {
       await crowdsale.updateCap(newCapIncrease, { from: addresses.wallet });
-    } catch (e) { error = e }
+    } catch (e) { nonOwnerError = e }
+
+    await crowdsale.unpause({from: addresses.owner});
 
     assert.equal(capAfterIncrease.toString(10), newCapIncrease, 'Unable to increase cap');
     assert.equal(capAfterDecrease.toString(10), newCapDecrease, 'Unable to decrease cap');
-    assert.instanceOf(error, Error, 'Anyone can update cap');
+    assert.instanceOf(updateWhenPausedError, Error, 'Cap can be updated while contract not paused');
+    assert.instanceOf(nonOwnerError, Error, 'Anyone can update cap');
   });
 
   it('Check investment (incl. bonuses)', async function() {
