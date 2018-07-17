@@ -7,7 +7,12 @@ const TokenVesting = artifacts.require('zeppelin-solidity/contracts/token/ERC20/
 
 contract('VervVluxCrowdsale', function(accounts) {
   const evm = util.evm(web3);
-  const addresses = util.accounts(util.isTest() ? accounts : []);
+/*   const addresses = util.accounts(util.isTest() ? accounts : []); */
+const addresses = {
+  owner: accounts[27],
+  companyWallet: accounts[28],
+  wallet: accounts[29],
+}
   const identity = util.identity(accounts);
   const { Stages, VestingDuration, toWei, fromWei, toTime, toBigNumber, cfg } = util;
   const whitelisted = [];
