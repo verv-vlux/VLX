@@ -406,6 +406,14 @@ const addresses = {
 
     await crowdsale.transferPauseManagement(newPauseManager, {from: addresses.owner});
 
+    await crowdsale.pause({from: newPauseManager});
+    let isPaused = await crowdsale.paused.call();
+    assert.equal(isPaused, true, 'New pause manager could not pause contract')
+    
+    await crowdsale.unpause({from: newPauseManager});
+    isPaused = await crowdsale.paused.call();
+    assert.equal(isPaused, false, 'New pause manager could not pause contract')
+
     const pauseManager = await crowdsale.pauseManager.call();
 
     assert.equal(pauseManager, newPauseManager, 'Pause manager did not set correctly.');
