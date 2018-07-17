@@ -21,7 +21,7 @@ contract('VervVluxCrowdsale', function(accounts) {
   const DAY2_RATE = '2050'; // 2.5% bonus
   const START_TIME = toTime('Wednesday, July 4, 2018 4:00:00 PM GMT+00:00');
   const END_TIME = toTime('Saturday, July 7, 2018 4:00:00 PM GMT+00:00');
-  const COMPANY_DIST = 34;
+  const COMPANY_DIST = 30;
 
   // add 5 whitelisted participants
   while (whitelisted.length < 5) {
