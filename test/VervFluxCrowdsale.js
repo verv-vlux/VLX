@@ -1,11 +1,11 @@
 'use strict';
 
 const util = require('../helper/util');
-const VervFluxCrowdsale = artifacts.require('./VervFluxCrowdsale.sol');
-const VervFluxToken = artifacts.require('./VervFluxToken.sol');
+const VervVluxCrowdsale = artifacts.require('./VervVluxCrowdsale.sol');
+const VervVluxToken = artifacts.require('./VervVluxToken.sol');
 const TokenVesting = artifacts.require('zeppelin-solidity/contracts/token/ERC20/TokenVesting.sol');
 
-contract('VervFluxCrowdsale', function(accounts) {
+contract('VervVluxCrowdsale', function(accounts) {
   const evm = util.evm(web3);
   const addresses = util.accounts(util.isTest() ? accounts : []);
   const identity = util.identity(accounts);
@@ -29,10 +29,10 @@ contract('VervFluxCrowdsale', function(accounts) {
   }
 
   it('Check initial state', async function() {
-    const crowdsale = await VervFluxCrowdsale.deployed();
+    const crowdsale = await VervVluxCrowdsale.deployed();
 
     const tokenAddress = await crowdsale.token.call();
-    const token = await VervFluxToken.at(tokenAddress);
+    const token = await VervVluxToken.at(tokenAddress);
     const tokenOwner = await token.owner.call();
     const tokenName = await token.name.call();
     const tokenSymbol = await token.symbol.call();
@@ -52,7 +52,7 @@ contract('VervFluxCrowdsale', function(accounts) {
     assert.equal(owner, addresses.owner, 'Wrong owner address');
     assert.equal(wallet, addresses.wallet, 'Wrong wallet address');
     assert.equal(companyWallet, addresses.companyWallet, 'Wrong company wallet address');
-    assert.equal(tokenName, 'Verv Flux', 'Wrong token name');
+    assert.equal(tokenName, 'Vlux by Verv', 'Wrong token name');
     assert.equal(tokenSymbol, 'VLUX', 'Wrong token symbol');
     assert.equal(tokenDecimals.toString(10), '18', 'Wrong token decimals');
     assert.equal(tokenMintingFinished, false, 'Wrong token minting status');
@@ -67,7 +67,7 @@ contract('VervFluxCrowdsale', function(accounts) {
   });
 
   it('Check an investment in presale fails', async function() {
-    const crowdsale = await VervFluxCrowdsale.deployed();    
+    const crowdsale = await VervVluxCrowdsale.deployed();
 
     let investorError = null;
     const investor = identity.next();
@@ -82,7 +82,7 @@ contract('VervFluxCrowdsale', function(accounts) {
   });
 
   it('Check investors whitelist and unwhitelist', async function() {
-    const crowdsale = await VervFluxCrowdsale.deployed();
+    const crowdsale = await VervVluxCrowdsale.deployed();
 
     await crowdsale.changeWhitelistParticipantsStatus(whitelisted, true, { from: addresses.owner, gas: 200000 });
     for (let investor of whitelisted) {
@@ -100,7 +100,7 @@ contract('VervFluxCrowdsale', function(accounts) {
   });
 
   it('Check whitelist status change function gas limit', async function() {
-    const crowdsale = await VervFluxCrowdsale.deployed();
+    const crowdsale = await VervVluxCrowdsale.deployed();
 
     let overLimitError = null;
 
@@ -119,7 +119,7 @@ contract('VervFluxCrowdsale', function(accounts) {
     const snapshot = await evm.snapshot();
 
     const newRate = '940';
-    const crowdsale = await VervFluxCrowdsale.deployed();
+    const crowdsale = await VervVluxCrowdsale.deployed();
     let error = null;
 
     await crowdsale.updateRate(newRate, { from: addresses.owner });
@@ -141,7 +141,7 @@ contract('VervFluxCrowdsale', function(accounts) {
 
     const newStartTime = START_TIME + 1000;
     const pastStartTime = toTime('Thursday, March 1, 2018 0:00:00 AM GMT+00:00');
-    const crowdsale = await VervFluxCrowdsale.deployed();
+    const crowdsale = await VervVluxCrowdsale.deployed();
     let nonOwnerError = null;
     let equalEndTimeError = null;
     let pastStartTimeError = null;
@@ -174,7 +174,7 @@ contract('VervFluxCrowdsale', function(accounts) {
     const snapshot = await evm.snapshot();
 
     const newEndTime = END_TIME + 1000;
-    const crowdsale = await VervFluxCrowdsale.deployed();
+    const crowdsale = await VervVluxCrowdsale.deployed();
     let nonOwnerError = null;
     let equalStartTimeError = null;
 
@@ -198,9 +198,9 @@ contract('VervFluxCrowdsale', function(accounts) {
   });
 
   it('Check presale investment and wei raised', async function() {
-    const crowdsale = await VervFluxCrowdsale.deployed();
+    const crowdsale = await VervVluxCrowdsale.deployed();
     const tokenAddress = await crowdsale.token.call();
-    const token = await VervFluxToken.at(tokenAddress);
+    const token = await VervVluxToken.at(tokenAddress);
 
     let errorContributionRate = null;
     let errorRewards = null;
@@ -249,7 +249,7 @@ contract('VervFluxCrowdsale', function(accounts) {
   });
 
   it('Check crowdsale start state', async function() {
-    const crowdsale = await VervFluxCrowdsale.deployed();
+    const crowdsale = await VervVluxCrowdsale.deployed();
     await evm.timeTravelTo(START_TIME + 10);
 
     await crowdsale.updateCap(toWei(parseInt(cfg.cap) + 1, 'ether'), { from: addresses.owner });
@@ -260,7 +260,7 @@ contract('VervFluxCrowdsale', function(accounts) {
   });
 
   it('Check cap update', async function() {
-    const crowdsale = await VervFluxCrowdsale.deployed();
+    const crowdsale = await VervVluxCrowdsale.deployed();
   
     const newCapIncrease = toWei(parseInt(cfg.cap) + 10, 'ether');
     const newCapDecrease = toWei(parseInt(cfg.cap) - 10, 'ether');
@@ -282,9 +282,9 @@ contract('VervFluxCrowdsale', function(accounts) {
   });
 
   it('Check investment (incl. bonuses)', async function() {
-    const crowdsale = await VervFluxCrowdsale.deployed();
+    const crowdsale = await VervVluxCrowdsale.deployed();
     const tokenAddress = await crowdsale.token.call();
-    const token = await VervFluxToken.at(tokenAddress);
+    const token = await VervVluxToken.at(tokenAddress);
 
     const day1Investment = toBigNumber(toWei(5, 'ether'));
     const day1TotalInvestment = toBigNumber(toWei(10, 'ether'));
@@ -350,7 +350,7 @@ contract('VervFluxCrowdsale', function(accounts) {
   });
 
   it('Check investment while paused', async function() {
-    const crowdsale = await VervFluxCrowdsale.deployed();
+    const crowdsale = await VervVluxCrowdsale.deployed();
 
     const investment = toWei(3, 'ether');
     const investor = identity.next();
@@ -380,7 +380,7 @@ contract('VervFluxCrowdsale', function(accounts) {
   });
 
   it('Check transfer pause management', async function() {
-    const crowdsale = await VervFluxCrowdsale.deployed();
+    const crowdsale = await VervVluxCrowdsale.deployed();
     const newPauseManager = identity.next();
 
     let transferError = null;
@@ -403,9 +403,9 @@ contract('VervFluxCrowdsale', function(accounts) {
   it('Check finalization by cap', async function() {
     const snapshot = await evm.snapshot();
 
-    const crowdsale = await VervFluxCrowdsale.deployed();
+    const crowdsale = await VervVluxCrowdsale.deployed();
     const tokenAddress = await crowdsale.token.call();
-    const token = await VervFluxToken.at(tokenAddress);
+    const token = await VervVluxToken.at(tokenAddress);
 
     const investor = whitelisted.shift();
     const cap = await crowdsale.cap.call();
@@ -429,9 +429,9 @@ contract('VervFluxCrowdsale', function(accounts) {
   });
   
   it('Check finalization by time (incl. dictribution)', async function() {
-    const crowdsale = await VervFluxCrowdsale.deployed();
+    const crowdsale = await VervVluxCrowdsale.deployed();
     const tokenAddress = await crowdsale.token.call();
-    const token = await VervFluxToken.at(tokenAddress);
+    const token = await VervVluxToken.at(tokenAddress);
 
     let secondFinalizeError = null;
     let investmentError = null;
@@ -466,9 +466,9 @@ contract('VervFluxCrowdsale', function(accounts) {
   });
 
   it('Check presale SAFT vesting', async function() {
-    const crowdsale = await VervFluxCrowdsale.deployed();
+    const crowdsale = await VervVluxCrowdsale.deployed();
     const tokenAddress = await crowdsale.token.call();
-    const token = await VervFluxToken.at(tokenAddress);
+    const token = await VervVluxToken.at(tokenAddress);
 
     const start = await testVesting.contract.start.call();
     const duration = await testVesting.contract.duration.call();
