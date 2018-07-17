@@ -110,12 +110,12 @@ const addresses = {
     let overLimitError = null;
 
     try {
-      await crowdsale.changeWhitelistParticipantsStatus(whitelisted, true, { from: addresses.owner, gas: 5000000 });
+      await crowdsale.changeWhitelistParticipantsStatus(whitelisted, true, { from: addresses.owner, gas: 7000000 });
     } catch(e) {
       overLimitError = e;
     }
 
-    await crowdsale.changeWhitelistParticipantsStatus(whitelisted, true, { from: addresses.owner, gas: 200000 });
+    await crowdsale.changeWhitelistParticipantsStatus(whitelisted, true, { from: addresses.owner, gas: 500000 });
 
     assert.instanceOf(overLimitError, Error, 'Could call whitelist status change function with gas amount over limit');
   });
