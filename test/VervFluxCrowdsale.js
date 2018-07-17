@@ -27,6 +27,7 @@ const addresses = {
   const START_TIME = toTime('Wednesday, July 4, 2018 4:00:00 PM GMT+00:00');
   const END_TIME = toTime('Saturday, July 7, 2018 4:00:00 PM GMT+00:00');
   const COMPANY_DIST = 30;
+  const MAX_END_TIME = 1546344000;
 
   // add 5 whitelisted participants
   while (whitelisted.length < 5) {
@@ -182,6 +183,7 @@ const addresses = {
     const crowdsale = await VervVluxCrowdsale.deployed();
     let nonOwnerError = null;
     let equalStartTimeError = null;
+    let overLimitTimeError = null;
 
     await crowdsale.updateEndTime(newEndTime, { from: addresses.owner });
 
@@ -193,11 +195,16 @@ const addresses = {
       await crowdsale.updateEndTime(START_TIME, { from: addresses.owner });
     } catch (e) { equalStartTimeError = e }
 
+    try {
+      await crowdsale.updateEndTime(MAX_END_TIME + 1000, { from: addresses.owner });
+    } catch (e) { overLimitTimeError = e }
+
     const endTime = await crowdsale.endTime.call();
 
     assert.equal(endTime.toString(10), newEndTime, 'Unable to update end time');
     assert.instanceOf(nonOwnerError, Error, 'Anyone can end time');
     assert.instanceOf(equalStartTimeError, Error, 'End time can be below start time');
+    assert.instanceOf(overLimitTimeError, Error, 'End time can be set to later than hard limit');
 
     await evm.revert(snapshot);
   });
