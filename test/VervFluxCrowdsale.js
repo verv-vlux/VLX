@@ -292,11 +292,8 @@ const addresses = {
     const crowdsale = await VervVluxCrowdsale.deployed();
     await evm.timeTravelTo(START_TIME + 10);
 
-    await crowdsale.pause({from: addresses.owner});
+    await crowdsale.increaseCap(toWei(parseInt(cfg.cap) + 1, 'ether'), { from: addresses.owner });
 
-    await crowdsale.updateCap(toWei(parseInt(cfg.cap) + 1, 'ether'), { from: addresses.owner });
-
-    await crowdsale.unpause({from: addresses.owner});
     const stage = await crowdsale.stage.call();
 
     assert.equal(stage.toString(10), Stages.Sale, 'Wrong stage');
