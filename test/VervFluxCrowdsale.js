@@ -341,10 +341,13 @@ const addresses = {
     } catch (e) { updateWhenPausedError = e }
     await crowdsale.unpause({from: addresses.owner});
 
-    assert.equal(capAfterIncrease.toString(10), newCapIncrease, 'Unable to increase cap');
-    assert.equal(capAfterDecrease.toString(10), newCapDecrease, 'Unable to decrease cap');
-    assert.instanceOf(updateWhenPausedError, Error, 'Cap can be updated while contract not paused');
-    assert.instanceOf(nonOwnerError, Error, 'Anyone can update cap');
+    assert.equal(capAfterIncrease.toString(10), newCapIncrease.toString(10), 'Unable to increase cap');
+    assert.equal(capAfterDecrease.toString(10), newCapDecrease.toString(10), 'Unable to decrease cap');
+    assert.instanceOf(updateWhenPausedError, Error, 'Cap can be decreased while contract not paused');
+    assert.instanceOf(nonOwnerIncreaseError, Error, 'Anyone can increase cap');
+    assert.instanceOf(nonOwnerDecreaseError, Error, 'Anyone can decrease cap');
+    assert.instanceOf(couldIncreaseCapThroughDecreaseError, Error, 'Cap can be increased through decrease function');
+    assert.instanceOf(couldDecreaseCapThroughIncreaseError, Error, 'Cap can be decreased through increase function');
   });
 
   it('Check investment (incl. bonuses)', async function() {
