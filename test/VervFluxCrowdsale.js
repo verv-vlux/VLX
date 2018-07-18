@@ -301,28 +301,44 @@ const addresses = {
 
   it('Check cap update', async function() {
     const crowdsale = await VervVluxCrowdsale.deployed();
-  
-    const newCapIncrease = toWei(parseInt(cfg.cap) + 10, 'ether');
-    const newCapDecrease = toWei(parseInt(cfg.cap) - 10, 'ether');
+
+    const currentCap = await crowdsale.cap.call();
+    const newCapIncrease = currentCap.add(toWei(1, 'ether'));
+    const newCapDecrease = currentCap.sub(toWei(1, 'ether'));
+
     let updateWhenPausedError = null;
-    let nonOwnerError = null;
+    let nonOwnerIncreaseError = null;
+    let nonOwnerDecreaseError = null;
+    let couldIncreaseCapThroughDecreaseError = null;
+    let couldDecreaseCapThroughIncreaseError = null;
 
     try {
-      await crowdsale.updateCap(newCapIncrease, { from: addresses.owner });
-    } catch (e) { updateWhenPausedError = e }
+      await crowdsale.increaseCap(newCapIncrease, { from: addresses.wallet });
+    } catch (e) { nonOwnerIncreaseError = e }
+
+    try {
+      await crowdsale.increaseCap(newCapDecrease, { from: addresses.owner });
+    } catch (e) { couldDecreaseCapThroughIncreaseError = e }
+
+    await crowdsale.increaseCap(newCapIncrease, { from: addresses.owner });
+    const capAfterIncrease = await crowdsale.cap.call();
 
     await crowdsale.pause({from: addresses.owner});
 
-    await crowdsale.updateCap(newCapIncrease, { from: addresses.owner });
-    const capAfterIncrease = await crowdsale.cap.call();
-
-    await crowdsale.updateCap(newCapDecrease, { from: addresses.owner });
+    await crowdsale.decreaseCap(newCapDecrease, { from: addresses.owner });
     const capAfterDecrease = await crowdsale.cap.call();
 
     try {
-      await crowdsale.updateCap(newCapIncrease, { from: addresses.wallet });
-    } catch (e) { nonOwnerError = e }
+      await crowdsale.decreaseCap(newCapIncrease, { from: addresses.wallet });
+    } catch (e) { couldIncreaseCapThroughDecreaseError = e }
 
+    try {
+      await crowdsale.decreaseCap(newCapDecrease, { from: addresses.wallet });
+    } catch (e) { nonOwnerDecreaseError = e }
+
+    try {
+      await crowdsale.decreaseCap(newCapDecrease, { from: addresses.wallet });
+    } catch (e) { updateWhenPausedError = e }
     await crowdsale.unpause({from: addresses.owner});
 
     assert.equal(capAfterIncrease.toString(10), newCapIncrease, 'Unable to increase cap');
