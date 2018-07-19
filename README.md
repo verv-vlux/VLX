@@ -1,6 +1,6 @@
-# Verv Flux ICO
+# Verv Vlux ITO
 
-This repository contains Verv Flux ICO contracts
+This repository contains Verv Vlux ITO contracts
 
 ## Requirements
 
@@ -8,8 +8,8 @@ Token requirements:
 
 - [x] Standard: “ERC20”
 - [x] Decimals: “18”
-- [x] Name “Verv Flux”
-- [x] Symbol “FLX”
+- [x] Name “Vlux by Verv”
+- [x] Symbol “VLX”
 - [x] Extends “MintableToken”
 - [x] Extends “Ownable”
 - [x] Initial supply is undefined
@@ -18,15 +18,15 @@ ICO requirements:
 
 - [x] Extends “Ownable”
 - [x] Extends “Pausable”
-- [x] Start time is “Saturday, March 31, 2018 12:00:00 AM” editable before start
-- [x] End time is “Wednesday, April 4, 2018 12:00:00 AM” editable before start
+- [x] Start time is “Wednesday, July 4, 2018 4:00:00 PM GMT+00:00” editable before start
+- [x] End time is “Saturday, July 7, 2018 4:00:00 PM GMT+00:00” editable before start
 - [x] Rate is “2000 FLX/ETH” editable before start
 - [x] Investments are transferred to a multisig “wallet”
 - [x] Tokens retained by the “company” - 34% transferred after sale end
 - [x] Ability to add addresses to whitelist available before start
-- [x] Bonus day 1 - “15%”
-- [x] Bonus day 2 - “12.5%”
-- [x] Bonus day 3 - “10%”
+- [x] Bonus day 1 - “5%”
+- [x] Bonus day 2 - “2.5%”
+- [x] Bonus day 3 - “0%”
 - [x] Day 1 allows whitelisted addresses to contribute a maximal amount of “10 ETH”
 - [x] Day 2 allows whitelisted addresses to contribute any amount
 - [x] Day 3 allows anyone to contribute any amount
