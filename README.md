@@ -14,7 +14,7 @@ Token requirements:
 - [x] Extends “Ownable”
 - [x] Initial supply is undefined
 
-ICO requirements:
+ITO requirements:
 
 - [x] Extends “Ownable”
 - [x] Extends “Pausable”
@@ -33,8 +33,8 @@ ICO requirements:
 - [x] Presale investment using function distributePreBuyersLkdRewards(investor, tokens, vesting)” available before start
 - [x] Presale investment using function disbursePreBuyersLkdContributions(investor, rate, vesting)” available before start (must be used real ether)
 - [x] Maximal rate for presale investment (disbursePreBuyersLkdContributions) is 8000
-- [x] Make possible updating ETH cap where `newCap > oldCap` (to match £20M target)
-- [x] Finish minting after the ICO ends
+- [x] Make possible updating ETH cap where `newCap > oldCap` (to match the cap target defined in white paper)
+- [x] Finish minting after the ITO ends
 
 Vesting requirements:
 
@@ -58,7 +58,7 @@ npm install
 
 ## Configuration
 
-In order to configure ICO edit:
+In order to configure ITO edit:
 
 - [MAINNET configuration](mainnet.config.json)
 - [TESTNET configuration](testnet.config.json)
