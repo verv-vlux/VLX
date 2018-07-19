@@ -305,7 +305,7 @@ const addresses = {
 		assert.equal(stage.toString(10), Stages.Sale, 'Wrong stage');
 	});
 
-	it('Check cap update', async function() {
+	it('Check increase and decrease cap', async function() {
 		const crowdsale = await VervVluxCrowdsale.deployed();
 
 		const currentCap = await crowdsale.cap.call();
