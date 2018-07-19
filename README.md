@@ -22,7 +22,7 @@ ICO requirements:
 - [x] End time is “Saturday, July 7, 2018 4:00:00 PM GMT+00:00” editable before start
 - [x] Rate is “2000 FLX/ETH” editable before start
 - [x] Investments are transferred to a multisig “wallet”
-- [x] Tokens retained by the “company” - 34% transferred after sale end
+- [x] Tokens retained by the “company” - 30% transferred after sale end
 - [x] Ability to add addresses to whitelist available before start
 - [x] Bonus day 1 - “5%”
 - [x] Bonus day 2 - “2.5%”
