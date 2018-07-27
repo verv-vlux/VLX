@@ -13,7 +13,6 @@ RUN sudo npm install -g solco@0.2.0
 RUN sudo npm install -g truffle@4.0.6
 RUN sudo npm install -g web3@0.20.5
 RUN sudo npm install -g zeppelin-solidity@1.6.0
-
 RUN ln -s /usr/lib/node_modules /root/
 
 WORKDIR /root/
