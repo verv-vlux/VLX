@@ -6,7 +6,7 @@ module.exports = {
   networks: {
     test: {
       host: "127.0.0.1",
-      port: 8545,
+      port: 8546,
       network_id: "*",
       gas: util.gas.maxGas,
       gasPrice: util.gas.price,
