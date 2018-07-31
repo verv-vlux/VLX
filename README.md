@@ -99,7 +99,19 @@ RUN ln -s /usr/lib/node_modules /root/
 
 WORKDIR /root/
 ```
-Or use the same dockerfile when pulling the repository.
+Next, download/pull the repository into the folder containing the Dockerfile.
+
+Execute the command below to build your docker image
+
+```bash
+docker build -t <IMAGE NAME> .
+```
+
+While in the directory with all the files, start the docker container with a shared container
+
+```bash
+docker run -v $(pwd):/root/ -it --name <CONTAINER NAME> <IMAGE NAME>
+```
 
 After building the container run the tests with the same steps described above.
 
