@@ -64,8 +64,6 @@ Run wallet application:
 
 ## Usage With Docker
 
-Testing with Docker needs the following Dockerfile:
-
 Linux:
 
 If not already installed, install docker from the ubuntu repositories with:
@@ -74,10 +72,10 @@ If not already installed, install docker from the ubuntu repositories with:
 sudo apt-get install docker
 ```
 
-In a directory of your choosing, create a Dockerfile with exact name "DockerFile"
-Note: Capital "D" for the file name is neccessary for docker to recognise the configuration
+In a directory of your choosing, create a Dockerfile with exact name "DockerFile".
+Note: Capital "D" for the file name is neccessary for docker to recognise the configuration.
 
-Copy the configuration below into this file and save
+Testing with Docker needs the following Dockerfile. Copy the configuration below into this file and save
 
 ```
 FROM ubuntu:14.04
@@ -101,13 +99,13 @@ WORKDIR /root/
 ```
 Next, download/pull the repository into the folder containing the Dockerfile.
 
-Execute the command below to build your docker image
+Execute the command below to build your docker image.
 
 ```bash
 docker build -t <IMAGE NAME> .
 ```
 
-While in the directory with all the files, start the docker container with a shared container
+While in the directory with all the files, start the docker container with a shared folder (Working directory).
 
 ```bash
 docker run -v $(pwd):/root/ -it --name <CONTAINER NAME> <IMAGE NAME>
