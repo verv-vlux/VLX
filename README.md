@@ -75,7 +75,7 @@ sudo apt-get install docker
 In a directory of your choosing, create a Dockerfile with exact name "DockerFile".
 Note: Capital "D" for the file name is neccessary for docker to recognise the configuration.
 
-Testing with Docker needs the following Dockerfile. Copy the configuration below into this file and save
+Testing with Docker needs the following Dockerfile. Copy the configuration below into this file and save.
 
 ```
 FROM ubuntu:14.04
@@ -105,13 +105,21 @@ Execute the command below to build your docker image.
 docker build -t <IMAGE NAME> .
 ```
 
-While in the directory with all the files, start the docker container with a shared folder (Working directory).
+With the working directory being where you chose to store the repository files, start the docker container with a shared folder.
 
 ```bash
 docker run -v $(pwd):/root/ -it --name <CONTAINER NAME> <IMAGE NAME>
 ```
 
-After building the container run the tests with the same steps described above.
+Try executing the command below and verify all the repository files are present
+```bash
+ls
+```
+Now that you are in the container, you should be able to run the tests with the same steps described above.
+
+Expected output:
+
+Screenshots/output soon.
 
 ## Architectural and Security Overview
 
