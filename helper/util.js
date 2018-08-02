@@ -213,8 +213,8 @@ const VestingDuration = {
   Mo12: '3',
 };
 
-const START_TIME = toTime('Thursday, August 2, 2018 0:00:00 AM GMT+00:00');
-const END_TIME = toTime('Sunday, August 5, 2018 0:00:00 AM GMT+00:00');
+const START_TIME = toTime('Sunday, November 4, 2018 4:00:00 PM GMT+00:00');
+const END_TIME = toTime('Wednesday, November 7, 2018 4:00:00 PM GMT+00:00');
 
 module.exports = {
   toWei, fromWei, toBigNumber,

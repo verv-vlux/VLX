@@ -24,8 +24,8 @@ const addresses = {
 	const RATE = '2000';
 	const DAY1_RATE = '2100'; // 5% bonus
 	const DAY2_RATE = '2050'; // 2.5% bonus
-	const START_TIME = toTime('Thursday, August 2, 2018 4:00:00 PM GMT+00:00');
-	const END_TIME = toTime('Sunday, August 5, 2018 4:00:00 PM GMT+00:00');
+	const START_TIME = toTime('Sunday, November 4, 2018 4:00:00 PM GMT+00:00');
+	const END_TIME = toTime('Wednesday, November 7, 2018 4:00:00 PM GMT+00:00');
 	const COMPANY_DIST = 30;
 	const MAX_END_TIME = 1546344000;
 
