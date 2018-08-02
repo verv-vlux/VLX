@@ -1,7 +1,7 @@
 {
-  "name": "verv-flux-ico",
+  "name": "verv-vlux-ico",
   "version": "1.0.0",
-  "description": "Verv Flux ICO",
+  "description": "Verv Vlux ICO",
   "main": "index.js",
   "scripts": {
     "faucet:ropsten": "./bin/faucet",
@@ -14,9 +14,9 @@
     "test": "$(npm run _truffle -s) test --network test",
     "version": "$(npm run _truffle -s) version",
     "docs": "npm run profile && npm run analyze && npm run visualize",
-    "profile": "$(npm run _solco -s) profile contracts/VervFluxCrowdsale.sol -r -o docs/interface-VervFluxCrowdsale.txt",
-    "analyze": "$(npm run _solco -s) analyze contracts/VervFluxCrowdsale.sol -o docs/analysis-VervFluxCrowdsale.txt",
-    "visualize": "$(npm run _solco -s) visualize contracts/VervFluxCrowdsale.sol -o docs/flow-VervFluxCrowdsale.svg",
+    "profile": "$(npm run _solco -s) profile contracts/VervVluxCrowdsale.sol -r -o docs/interface-VervVluxCrowdsale.txt",
+    "analyze": "$(npm run _solco -s) analyze contracts/VervVluxCrowdsale.sol -o docs/analysis-VervVluxCrowdsale.txt",
+    "visualize": "$(npm run _solco -s) visualize contracts/VervVluxCrowdsale.sol -o docs/flow-VervVluxCrowdsale.svg",
     "_truffle": "echo $(npm bin)/truffle",
     "_solco": "echo $(npm bin)/solco"
   },
