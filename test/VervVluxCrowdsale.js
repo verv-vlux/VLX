@@ -7,12 +7,14 @@ const TokenVesting = artifacts.require('zeppelin-solidity/contracts/token/ERC20/
 
 contract('VervVluxCrowdsale', function(accounts) {
 	const evm = util.evm(web3);
-/*   const addresses = util.accounts(util.isTest() ? accounts : []); */
+	const addresses = util.accounts(util.isTest() ? accounts : []);
+/*
 const addresses = {
 	owner: accounts[7],
 	companyWallet: accounts[8],
 	wallet: accounts[9],
 }
+*/
 	const identity = util.identity(accounts);
 	const { Stages, VestingDuration, toWei, fromWei, toTime, toBigNumber, cfg } = util;
 	const whitelisted = [];
@@ -146,7 +148,7 @@ const addresses = {
 		const snapshot = await evm.snapshot();
 
 		const newStartTime = START_TIME + 1000;
-		const pastStartTime = toTime('Thursday, March 1, 2018 0:00:00 AM GMT+00:00');
+		const pastStartTime = toTime('Sunday, November 4, 2018 4:00:00 PM GMT+00:00');
 		const crowdsale = await VervVluxCrowdsale.deployed();
 		let nonOwnerError = null;
 		let equalEndTimeError = null;
