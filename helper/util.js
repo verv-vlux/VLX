@@ -61,7 +61,7 @@ function toTime(str) {
 }
 
 function isTest() {
-  return process.argv[2].toLowerCase() === 'test';
+  return process.argv[2].toLowerCase() === 'test' || process.argv[4].toLowerCase() === 'test';
 }
 
 function accounts(accounts) {
