@@ -20,6 +20,6 @@ module.exports = (deployer, network, accounts) => {
     addresses.wallet,
     util.toWei(util.cfg.cap, 'ether'),
     util.START_TIME,
-    { gas: util.gas.amount.VervVluxCrowdsale }
+    //{ gas: util.gas.amount.VervVluxCrowdsale }
   );
 };
