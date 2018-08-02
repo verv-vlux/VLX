@@ -8,8 +8,6 @@ module.exports = {
       host: "127.0.0.1",
       port: 8546,
       network_id: "*",
-      gas: util.gas.maxGas,
-      gasPrice: util.gas.price,
     },
     testnet: {
       host: "127.0.0.1",
