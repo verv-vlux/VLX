@@ -6,8 +6,8 @@
   "scripts": {
     "faucet:ropsten": "./bin/faucet",
     "deploy:mainnet": "ICO_NETWORK=mainnet $(npm run _truffle -s) migrate --network mainnet",
-    "deploy:testnet": "ICO_NETWORK=testnet $(npm run _truffle -s) migrate --network testnet",
-    "deploy:test": "ICO_NETWORK=test $(npm run _truffle -s) migrate --network test",
+    "deploy:testnet": "ICO_NETWORK=testnet $(npm run _truffle -s) migrate --network testnet --reset",
+    "deploy:test": "ICO_NETWORK=test $(npm run _truffle -s) migrate --network test --reset",
     "compile:mainnet": "ICO_NETWORK=mainnet $(npm run _truffle -s) compile --network mainnet",
     "compile:testnet": "ICO_NETWORK=testnet $(npm run _truffle -s) compile --network testnet",
     "compile:test": "ICO_NETWORK=test $(npm run _truffle -s) compile --network test",
