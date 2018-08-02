@@ -1,8 +1,11 @@
 {
   "amount": {
-    "Migrations": 227174,
-    "VervFluxCrowdsale": 4568207
+    "Migrations": 267174,
+    "VervVluxCrowdsale": 4795696
   },
-  "maxGas": 4600000,
-  "price": 10000000000
+  "maxGas": 4799999,
+  "price": 10000000000,
+  "backupamountmigrations": 327174,
+  "backupamountvervvlux": 6720000,
+  "backupmaxgas": 6721975
 }
