@@ -113,10 +113,10 @@ Once you have verified all the files are present, you must now install the requi
 npm install
 ```
 
-You can now launch the test environment by executing
+You can now launch the test environment in the background with access to logs
 
 ```bash
-npm run testrpc
+nohup npm run testrpc > log.txt 2> log.txt &
 ```
 
 Finally execute the tests with:
