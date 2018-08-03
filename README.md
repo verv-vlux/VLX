@@ -71,11 +71,11 @@ If not already installed, install docker from the ubuntu repositories with:
 ```bash
 sudo apt-get install docker
 ```
+In a directory of your choosing, pull/download the repository.
 
-In a directory of your choosing, create a Dockerfile with exact name "DockerFile".
-Note: Capital "D" for the file name is neccessary for docker to recognise the configuration.
+Included is a Dockerfile that contains a configuartion with the neccessary tools to run the test.
 
-Testing with Docker needs the following Dockerfile. Copy the configuration below into this file and save.
+This Dockerfile contains the following:
 
 ```
 FROM ubuntu:14.04
@@ -89,15 +89,14 @@ RUN sudo apt-get install -y nodejs
 
 WORKDIR /root/
 ```
-Next, download/pull the repository into the folder containing the Dockerfile.
 
-Execute the command below to build your docker image.
+While having the terminal in this directory, run the following command to generate your docker image.
 
 ```bash
 docker build -t <IMAGE NAME> .
 ```
 
-With the working directory being where you chose to store the repository files, start the docker container with a shared folder.
+Next, in the same directory where you chose to store the repository files, start the docker container with a shared folder.
 
 ```bash
 docker run -v $(pwd):/root/ -it --name <CONTAINER NAME> <IMAGE NAME>
@@ -107,11 +106,24 @@ Try executing the command below and verify all the repository files are present
 ```bash
 ls
 ```
-Now that you are in the container, you should be able to run the tests with the same steps described above.
 
-Expected output:
+Once you have verified all the files are present, you must now install the required modules
 
-Screenshots/output soon.
+```bash
+npm install
+```
+
+You can now launch the test environment by executing
+
+```bash
+npm run testrpc
+```
+
+Finally execute the tests with:
+
+```bash
+npm run test
+```
 
 ## Architectural and Security Overview
 
