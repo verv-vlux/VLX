@@ -1,0 +1,6 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Link to 
+Type=Link
+URL=https://raw.githubusercontent.com/OpenZeppelin/openzeppelin-solidity/v1.6.0/contracts/token/ERC20/MintableToken.sol
+Icon=text-plain
