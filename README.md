@@ -66,7 +66,9 @@ Run wallet application:
 
 Linux:
 
-If not already installed, install docker from the ubuntu repositories with:
+If not already installed, install docker from your chosen repository
+
+Below is the command for ubuntu based distributions:
 
 ```bash
 sudo apt-get install docker
