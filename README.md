@@ -73,7 +73,8 @@ sudo apt-get install docker
 ```
 In a directory of your choosing, pull/download the repository.
 
-Included is a Dockerfile that contains a configuartion with the neccessary tools to run the test.
+You should notice there is a Dockerfile included with the repository.
+This contains the configuration of packages necessary to run the test environment.
 
 This Dockerfile contains the following:
 
