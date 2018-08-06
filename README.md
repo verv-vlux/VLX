@@ -102,8 +102,8 @@ Next, in the same directory where you chose to store the repository files, start
 ```bash
 docker run -v $(pwd):/root/ -it --name <CONTAINER NAME> <IMAGE NAME>
 ```
-
-Try executing the command below and verify all the repository files are present
+This should start bash in the new docker container.
+Next, try executing the command below and verify all the repository files are present
 ```bash
 ls
 ```
