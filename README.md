@@ -107,6 +107,9 @@ Try executing the command below and verify all the repository files are present
 ```bash
 ls
 ```
+You should see the following:
+
+![1 ls](https://user-images.githubusercontent.com/41786403/43727142-0f82c00e-9999-11e8-997f-70354ec566ea.png)
 
 Once you have verified all the files are present, you must now install the required modules
 
