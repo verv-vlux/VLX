@@ -118,6 +118,9 @@ Once you have verified all the files are present, you must now install the requi
 ```bash
 npm install
 ```
+Ensure that all the neccessary packages have been installed without error.
+
+![npminstall](https://user-images.githubusercontent.com/41786403/43769472-b2970802-9a31-11e8-9ec9-b3919784dbe5.png)
 
 You can now launch the test environment in the background with access to logs
 
