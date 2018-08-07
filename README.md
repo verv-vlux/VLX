@@ -128,6 +128,11 @@ You can now launch the test environment in the background with access to logs
 nohup npm run testrpc > log.txt 2> log.txt &
 ```
 
+This should launch the wallets in the background without having to open another window
+
+![npmruntestrpc](https://user-images.githubusercontent.com/41786403/43769696-3d734102-9a32-11e8-98c1-df26050c4317.png)
+
+
 Finally execute the tests with:
 
 ```bash
