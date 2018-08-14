@@ -144,11 +144,12 @@ If successful, you should see the tests pass like below:
 ![npmtest](https://user-images.githubusercontent.com/41786403/43769803-8c1dd8da-9a32-11e8-9f19-799de57bd2b7.png)
 
 
-## Usage with truffle flattener
+## Usage with Truffle Flattener
 
 You are also able to verify contracts that were developed with Truffle on Etherscan.
 
 Installation:
+
 If you would like to verify the smart contracts using truffle flattener, install the package using:
 
 ```bash
