@@ -146,7 +146,15 @@ If successful, you should see the tests pass like below:
 
 ## Usage with truffle flattener
 
-?
+You are also able to verify contracts that were developed with Truffle on Etherscan.
+
+Installation:
+If you would like to verify the smart contracts using truffle flattener, install the package using:
+
+```bash
+npm install truffle-flattener -g
+```
+
 
 ## Architectural and Security Overview
 
