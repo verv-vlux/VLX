@@ -150,7 +150,7 @@ You are also able to verify contracts that were developed with Truffle on Ethers
 
 Installation:
 
-If you would like to verify the smart contracts using truffle flattener, install the package using:
+If you would like to verify the smart contracts using truffle flattener, install the package while in your docker container:
 
 ```bash
 npm install truffle-flattener -g
@@ -166,6 +166,8 @@ Run the following  with your files of choice to generate your flattened file:
 ```bash
 truffle-flattener <solidity-files>
 ```
+
+Alternatively you can use the already generated file located in the the same contracts folder. 
 
 ## Architectural and Security Overview
 
