@@ -64,6 +64,9 @@ Run wallet application:
 
 ## Usage With Docker
 
+Using docker allows you to run the smart contract test in an environment that contains all the neccessary dependencies.
+All of these dependencies are included in the configuration file for docker seen below.
+
 Linux:
 
 If not already installed, install docker from your chosen repository.
