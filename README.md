@@ -146,7 +146,7 @@ If successful, you should see the tests pass like below:
 
 ## Usage with Truffle Flattener
 
-You are also able to verify contracts that were developed with Truffle on Etherscan.
+You are also able to verify contracts that were developed with Truffle on Etherscan using a flattened solidty file.
 
 Installation:
 
@@ -156,6 +156,16 @@ If you would like to verify the smart contracts using truffle flattener, install
 npm install truffle-flattener -g
 ```
 
+While in the main directory, navigate to where the smart contracts are located:
+
+```bash
+cd contracts
+```
+Run the following  with your files of choice to generate your flattened file:
+
+```bash
+truffle-flattener <solidity-files>
+```
 
 ## Architectural and Security Overview
 
